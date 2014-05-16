@@ -1,59 +1,61 @@
-import java.util.*;
-import java.net.*;
-import java.awt.*;
-import java.applet.*;
-import javax.swing.*;
-import javax.swing.event.*;
+import java.applet.AppletContext;
+import java.awt.BorderLayout;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import javax.swing.JApplet;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JScrollPane;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
-public class Netapp extends JApplet {
-
-	private HashMap<String, URL> websiteInfo;
-	private ArrayList<String> titles;
-	private JList mainList;
-	
-	public void init(){
-		websiteInfo = new HashMap<String, URL>();
-		titles = new ArrayList<String>();
-		mainList = new JList<>(titles.toArray());
-		
-		
-		getHTMLInfo();
-		
-		add(new JLabel("Where do you want to go?"), BorderLayout.NORTH);
-		
-		mainList.addListSelectionListener(
-				new ListSelectionListener(){
-					public void valueChanged(ListSelectionEvent e){
-						URL landing = websiteInfo.get(mainList.getSelectedValue());
-						AppletContext browser = getAppletContext();
-						browser.showDocument(landing);		
-					}
-				}
-							);
-		
-		add(new JScrollPane(mainList),BorderLayout.CENTER);
-	}
-	
-	public void getHTMLInfo(){
-		String address;
-		String title;
-		URL urlo;
-		int counter = 0;
-		
-		title = getParameter("title"+counter);
-		
-		while(title != null){
-			address = getParameter("go"+counter);
-			try{
-				titles.add(title);
-				urlo = new URL(address);
-				websiteInfo.put(title, urlo);
-			}catch(MalformedURLException urlException){
-				urlException.printStackTrace();
-			}
-			++counter;
-			title = getParameter("title"+counter);
-		}
-	}
-	
+public class BuckysSites extends JApplet {
+    private HashMap<String, URL> websiteInfo;
+    private ArrayList<String> titles;
+    private JList mainList;
+   
+    @Override
+    public void init() {
+        websiteInfo = new HashMap<>();
+        titles = new ArrayList<>();
+       
+        grabHTMLInfo();
+        add(new JLabel("What website do you want to visit?"), BorderLayout.NORTH);
+        mainList = new JList(titles.toArray());
+       
+        mainList.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent lse) {
+                Object object = mainList.getSelectedValue();
+                URL newDocument = websiteInfo.get(object);
+                AppletContext browser = getAppletContext();
+                browser.showDocument(newDocument);
+            }
+        });
+        add(new JScrollPane(mainList), BorderLayout.CENTER);
+    }
+   
+    private void grabHTMLInfo() {
+        String title;
+        String adress;
+        URL url;
+        int counter = 0;
+        title = getParameter("title"+counter);
+       
+        while (title != null) {           
+            adress = getParameter("adress"+counter);
+            try {
+                url = new URL(adress);
+                websiteInfo.put(title, url);
+                titles.add(title);
+            } catch(MalformedURLException urlEx) {
+                urlEx.printStackTrace();
+            }
+           
+            ++counter;
+            title = getParameter("title"+counter);
+        }
+    }
 }
